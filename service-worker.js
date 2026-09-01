@@ -1,6 +1,6 @@
 // service-worker.js — Cache de la app shell y funcionamiento offline.
 
-const CACHE_VERSION = 'foodstock-v4';
+const CACHE_VERSION = 'foodstock-v5';
 const APP_SHELL = [
   './',
   './index.html',

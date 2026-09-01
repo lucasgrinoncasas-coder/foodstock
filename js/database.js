@@ -132,10 +132,20 @@ export const db = {
 
   // Escucha cambios en tiempo real de un store (para sincronizar entre
   // dispositivos). Devuelve una función para dejar de escuchar.
+  //
+  // Se ignoran los snapshots que todavía tienen escrituras locales
+  // pendientes de confirmar (metadata.hasPendingWrites): esos son el "eco"
+  // de un cambio hecho en este mismo dispositivo, cuya pantalla ya se ha
+  // actualizado al momento por la propia acción del usuario. Repintar la
+  // pantalla entera otra vez por ese eco es lo que causaba el parpadeo al
+  // sumar/restar cantidades. Los cambios que vienen de verdad de otro
+  // dispositivo nunca tienen escrituras pendientes en este, así que siguen
+  // disparando la sincronización con normalidad.
   watchStore(storeName, callback) {
     let unsub = () => {};
     try {
       unsub = onSnapshot(storeCollection(storeName), (snap) => {
+        if (snap.metadata.hasPendingWrites) return;
         callback(snap.docs.map((d) => d.data()));
       }, (err) => console.warn(`Error escuchando "${storeName}":`, err));
     } catch (err) {
