@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>FoodStock — Gestiona tu comida en casa</title>
+<meta name="description" content="Gestiona la nevera, el congelador, la despensa, la lista de la compra y tus comidas planificadas desde una sola app." />
+<meta name="theme-color" content="#4F8EF7" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0F1720" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#4F8EF7" id="theme-color-meta" />
+
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="assets/icons/icon-192.png" />
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="FoodStock" />
+<meta name="mobile-web-app-capable" content="yes" />
+
+<link rel="stylesheet" href="css/styles.css" />
+<link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#app">Saltar al contenido</a>
+
+<div id="auth-screen" class="hidden"></div>
+
+<div id="root" class="hidden">
+
+  <header class="topbar" id="topbar">
+    <button class="icon-btn household-switch" id="household-switch-btn" aria-haspopup="dialog" aria-label="Cambiar de vivienda">
+      <span id="household-emoji">🏠</span>
+      <span id="household-name" class="household-name">Casa</span>
+      <span class="chevron">▾</span>
+    </button>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="search-btn" aria-label="Buscar">🔍</button>
+      <a class="icon-btn" id="settings-link" href="#/ajustes" aria-label="Ajustes">⚙️</a>
+    </div>
+  </header>
+
+  <nav class="desktop-nav" id="desktop-nav" aria-label="Navegación principal">
+    <a href="#/inicio" data-route="/inicio">🏠 <span>Inicio</span></a>
+    <a href="#/alimentos" data-route="/alimentos">📦 <span>Alimentos</span></a>
+    <a href="#/compra" data-route="/compra">🛒 <span>Compra</span></a>
+    <a href="#/calendario" data-route="/calendario">📅 <span>Calendario</span></a>
+    <a href="#/recetas" data-route="/recetas">🍳 <span>Recetas</span></a>
+    <a href="#/ia" data-route="/ia">🤖 <span>IA</span></a>
+  </nav>
+
+  <main id="app" tabindex="-1"></main>
+
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Navegación inferior">
+    <a href="#/inicio" data-route="/inicio"><span class="bn-icon">🏠</span><span class="bn-label">Inicio</span></a>
+    <a href="#/alimentos" data-route="/alimentos"><span class="bn-icon">📦</span><span class="bn-label">Alimentos</span></a>
+    <a href="#/compra" data-route="/compra"><span class="bn-icon">🛒</span><span class="bn-label">Compra</span></a>
+    <a href="#/calendario" data-route="/calendario"><span class="bn-icon">📅</span><span class="bn-label">Calendario</span></a>
+    <a href="#/ia" data-route="/ia"><span class="bn-icon">🤖</span><span class="bn-label">IA</span></a>
+  </nav>
+
+</div>
+
+<div id="modal-root"></div>
+<div id="toast-container" aria-live="polite"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

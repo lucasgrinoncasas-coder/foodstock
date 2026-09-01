@@ -1,0 +1,19 @@
+{
+  "name": "FoodStock — Gestión de alimentos",
+  "short_name": "FoodStock",
+  "description": "Gestiona la nevera, el congelador, la despensa, la lista de la compra y tus comidas planificadas.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F8FA",
+  "theme_color": "#4F8EF7",
+  "lang": "es",
+  "categories": ["food", "lifestyle", "productivity"],
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

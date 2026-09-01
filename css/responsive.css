@@ -1,0 +1,66 @@
+/* responsive.css — Adaptaciones por tamaño de pantalla */
+
+/* Tablet */
+@media (min-width: 640px) {
+  #app { padding-left: 24px; padding-right: 24px; }
+  .grid-3 { gap: 14px; }
+}
+
+/* Escritorio: navegación superior en vez de barra inferior */
+@media (min-width: 900px) {
+  .bottom-nav { display: none; }
+  .desktop-nav {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    padding: 10px 16px;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: calc(var(--topbar-h) + var(--safe-top));
+    z-index: 39;
+  }
+  .desktop-nav a {
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .desktop-nav a.active { background: var(--color-primary-soft); color: var(--color-primary); }
+
+  #app {
+    max-width: 900px;
+    padding-bottom: 40px;
+  }
+
+  .fab { bottom: 24px; }
+  #toast-container { bottom: 24px; }
+
+  .grid-3 { grid-template-columns: repeat(4, 1fr); }
+
+  .modal-overlay { align-items: center; }
+  .modal-sheet {
+    border-radius: 20px;
+    max-height: 84vh;
+  }
+}
+
+@media (min-width: 1200px) {
+  #app { max-width: 1040px; }
+}
+
+/* Pantallas muy pequeñas (iPhone SE) */
+@media (max-width: 360px) {
+  .grid-3 { gap: 8px; }
+  .stat-card { padding: 10px 6px; }
+  .stat-value { font-size: 17px; }
+}
+
+/* Preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
