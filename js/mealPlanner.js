@@ -40,7 +40,11 @@ async function scoreRecipes(householdId, goals) {
       const missing = recipe.ingredients.filter((ing) => !stock.has(normalize(ing.name)));
       const matchRatio = have.length / total;
 
-      let score = matchRatio; // por defecto: prioriza lo que ya puedes preparar
+      // Puntuación base pequeña y con algo de ruido aleatorio: así, si no se
+      // elige "Aprovechar lo que tengo", el plan no se limita siempre a las
+      // recetas que ya tienes completas (si no, casi nunca faltaría comprar
+      // nada, que es justo lo contrario de lo que se espera de esta función).
+      let score = matchRatio * 0.2 + Math.random() * 0.3;
       if (goals.includes('quick')) {
         score += (recipe.time && recipe.time <= 30 ? 1.5 : 0) + (recipe.category === 'Rápida' ? 0.5 : 0);
       }
@@ -117,10 +121,10 @@ export async function generateWeeklyPlan(householdId, { goals = [], meals = ['co
 
       pick.missing.forEach((ing) => {
         const key = normalize(ing.name);
-        const existing = missingMap.get(key);
+        const entry = missingMap.get(key);
         const quantity = ing.quantity != null ? ing.quantity : 1;
-        if (existing) {
-          existing.quantity += quantity;
+        if (entry) {
+          entry.quantity += quantity;
         } else {
           missingMap.set(key, { name: ing.name, unit: ing.unit || 'unidades', quantity });
         }

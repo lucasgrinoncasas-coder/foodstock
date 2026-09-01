@@ -4,30 +4,32 @@ import { registerRoute, setNotFoundRoute, initRouter, renderRoute } from './ui.j
 import { getHouseholds, getCurrentHouseholdId, setCurrentHouseholdId } from './households.js';
 import { getSettings } from './settings.js';
 import { applyTheme } from './theme.js';
-import { seedDemoData } from './demoData.js';
 import { openHouseholdSwitcherModal, refreshHouseholdTopbar } from './views/householdsView.js';
-import { openGlobalSearchModal } from './views/search.js';
 import { bus, debounce } from './utils.js';
 import { db, STORES } from './database.js';
 import { isFirebaseConfigured } from './firebaseConfig.js';
 import { initAuthListener, waitForAuthReady, onAuthChange } from './auth.js';
 import { renderSetupScreen, renderLoginScreen } from './views/loginView.js';
 
-import * as homeView from './views/home.js';
-import * as inventoryView from './views/inventory.js';
-import * as shoppingView from './views/shoppingView.js';
-import * as calendarView from './views/calendarView.js';
-import * as recipesView from './views/recipesView.js';
-import * as aiView from './views/ai.js';
-import * as settingsView from './views/settingsView.js';
+// Cada vista se carga solo la primera vez que se visita su ruta, en vez de
+// todas de golpe al arrancar — esto es lo que más pesa en el arranque
+// (recetario con 300+ recetas, calendario, IA…), así que aplazarlo hasta
+// que hace falta acelera mucho la primera pantalla, sobre todo en móvil.
+function lazyRoute(loader) {
+  let modPromise;
+  return (container, query) => {
+    if (!modPromise) modPromise = loader();
+    return modPromise.then((mod) => mod.render(container, query));
+  };
+}
 
-registerRoute('/inicio', homeView.render);
-registerRoute('/alimentos', inventoryView.render);
-registerRoute('/compra', shoppingView.render);
-registerRoute('/calendario', calendarView.render);
-registerRoute('/recetas', recipesView.render);
-registerRoute('/ia', aiView.render);
-registerRoute('/ajustes', settingsView.render);
+registerRoute('/inicio', lazyRoute(() => import('./views/home.js')));
+registerRoute('/alimentos', lazyRoute(() => import('./views/inventory.js')));
+registerRoute('/compra', lazyRoute(() => import('./views/shoppingView.js')));
+registerRoute('/calendario', lazyRoute(() => import('./views/calendarView.js')));
+registerRoute('/recetas', lazyRoute(() => import('./views/recipesView.js')));
+registerRoute('/ia', lazyRoute(() => import('./views/ai.js')));
+registerRoute('/ajustes', lazyRoute(() => import('./views/settingsView.js')));
 setNotFoundRoute('/inicio');
 
 let appStarted = false;
@@ -85,6 +87,7 @@ async function runApp() {
 
   const households = await getHouseholds();
   if (!households.length) {
+    const { seedDemoData } = await import('./demoData.js');
     const household = await seedDemoData();
     await setCurrentHouseholdId(household.id);
   } else {
@@ -95,7 +98,10 @@ async function runApp() {
   await initRouter();
 
   document.getElementById('household-switch-btn').addEventListener('click', openHouseholdSwitcherModal);
-  document.getElementById('search-btn').addEventListener('click', openGlobalSearchModal);
+  document.getElementById('search-btn').addEventListener('click', async () => {
+    const { openGlobalSearchModal } = await import('./views/search.js');
+    openGlobalSearchModal();
+  });
 
   window.addEventListener('foodstock:household-switched', async () => {
     await refreshHouseholdTopbar();
@@ -108,6 +114,7 @@ async function runApp() {
     stopLiveSync();
     const remaining = await getHouseholds();
     if (!remaining.length) {
+      const { seedDemoData } = await import('./demoData.js');
       const household = await seedDemoData();
       await setCurrentHouseholdId(household.id);
     }

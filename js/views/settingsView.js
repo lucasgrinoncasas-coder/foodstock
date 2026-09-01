@@ -4,7 +4,6 @@ import { getCurrentHouseholdId, getHousehold } from '../households.js';
 import { getSettings, setSetting } from '../settings.js';
 import { getStats } from '../stats.js';
 import { db } from '../database.js';
-import { seedDemoData } from '../demoData.js';
 import { applyTheme } from '../theme.js';
 import { importRecipeCatalog } from '../recipes.js';
 import { RECIPE_PACKS } from '../recipePacks.js';
@@ -214,6 +213,7 @@ function wireEvents(container, householdId) {
       confirmLabel: 'Restaurar',
     });
     if (!ok) return;
+    const { seedDemoData } = await import('../demoData.js');
     const household = await seedDemoData();
     const { setCurrentHouseholdId } = await import('../households.js');
     await setCurrentHouseholdId(household.id);

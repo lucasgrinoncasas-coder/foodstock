@@ -25,21 +25,29 @@ export function currentQuery() {
   return Object.fromEntries(new URLSearchParams(query || ''));
 }
 
+let renderGeneration = 0;
+
 export async function renderRoute() {
+  const generation = (renderGeneration += 1);
   const hash = window.location.hash.replace('#', '') || notFoundRoute;
   const [path] = hash.split('?');
   const renderFn = routes.get(path) || routes.get(notFoundRoute);
   highlightNav(routes.has(path) ? path : notFoundRoute);
 
   const app = document.getElementById('app');
+  // Si otra llamada a renderRoute() se lanza mientras esta espera datos
+  // (típico cuando llegan varios cambios en tiempo real casi a la vez),
+  // esta versión antigua no debe pisar el resultado de la más nueva.
   app.classList.remove('view-enter');
   app.innerHTML = '<div class="spinner"></div>';
 
   try {
     await renderFn(app, currentQuery());
+    if (generation !== renderGeneration) return;
     app.classList.add('view-enter');
     app.scrollTop = 0;
   } catch (err) {
+    if (generation !== renderGeneration) return;
     console.error('Error al renderizar la vista:', err);
     app.innerHTML = `
       <div class="empty-state">

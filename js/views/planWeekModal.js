@@ -5,7 +5,6 @@ import { openModal, closeModal, navigate } from '../ui.js';
 import { escapeHTML, toast, debounce, formatDateLabel } from '../utils.js';
 
 const MEAL_OPTIONS = [
-  { id: 'desayuno', label: '🥣 Desayuno', defaultOn: false },
   { id: 'comida', label: '🍝 Comida', defaultOn: true },
   { id: 'cena', label: '🥗 Cena', defaultOn: true },
 ];

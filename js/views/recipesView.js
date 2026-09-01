@@ -8,18 +8,23 @@ import {
 import { createEntry, resolveMissingIngredients } from '../calendar.js';
 import { addItem as addShoppingItem } from '../shopping.js';
 import { getSetting } from '../settings.js';
+import { getProducts } from '../products.js';
 import { RECIPE_CATEGORIES, DIFFICULTIES, MEAL_TYPES, UNITS } from '../constants.js';
 import { emptyState, recipeCardMini } from '../components.js';
 import { openModal, closeModal, confirmDialog } from '../ui.js';
-import { escapeHTML, toast, todayKey } from '../utils.js';
+import { escapeHTML, toast, todayKey, debounce, normalize } from '../utils.js';
 
-let state = { category: null, favoritesOnly: false };
+let state = { category: null, favoritesOnly: false, query: '' };
 
 export async function render(container) {
   const householdId = await getCurrentHouseholdId();
 
   container.innerHTML = `
     <h1 class="greeting">🍳 Recetas</h1>
+    <div class="search-bar">
+      <span>🔍</span>
+      <input type="text" id="recipe-search" placeholder="Busca una receta..." value="${escapeHTML(state.query)}" />
+    </div>
     <div class="chip-row" id="recipe-filters">
       <button class="chip ${state.favoritesOnly ? 'active' : ''}" data-toggle="favoritesOnly">⭐ Favoritas</button>
       ${RECIPE_CATEGORIES.map((c) => `<button class="chip ${state.category === c ? 'active' : ''}" data-category="${c}">${c}</button>`).join('')}
@@ -27,6 +32,11 @@ export async function render(container) {
     <div id="recipe-list" class="stack mt-16" style="gap:8px;"></div>
     <button class="fab" id="fab-add-recipe" aria-label="Añadir receta">+</button>
   `;
+
+  container.querySelector('#recipe-search').addEventListener('input', debounce((e) => {
+    state.query = e.target.value;
+    refresh(householdId);
+  }, 200));
 
   container.querySelectorAll('#recipe-filters [data-toggle]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -52,19 +62,28 @@ async function refresh(householdId) {
   const listEl = document.getElementById('recipe-list');
   if (!listEl) return;
   let recipes = await getRecipes();
+  if (state.query.trim()) {
+    const q = normalize(state.query);
+    recipes = recipes.filter((r) => normalize(r.name).includes(q) || r.ingredients.some((ing) => normalize(ing.name).includes(q)));
+  }
   if (state.favoritesOnly) recipes = recipes.filter((r) => r.favorite);
   if (state.category) recipes = recipes.filter((r) => r.category === state.category);
 
   if (!recipes.length) {
-    listEl.innerHTML = emptyState('🍳', 'No hay recetas con estos filtros. Añade una nueva.');
+    listEl.innerHTML = emptyState('🍳', 'No hay recetas con estos filtros. Prueba a cambiar la búsqueda o añade una nueva.');
     return;
   }
 
-  const withMatch = await Promise.all(recipes.map(async (r) => {
-    const { available } = await checkAvailability(r.id, householdId);
-    const ratio = r.ingredients.length ? available.length / r.ingredients.length : 0;
+  // Una sola lectura de productos para toda la lista, en vez de una por
+  // receta: con cientos de recetas, repetirla por cada una era el mayor
+  // cuello de botella de esta pantalla.
+  const products = await getProducts(householdId);
+  const stock = new Set(products.filter((p) => p.quantity > 0).map((p) => normalize(p.name)));
+  const withMatch = recipes.map((r) => {
+    const have = r.ingredients.filter((ing) => stock.has(normalize(ing.name))).length;
+    const ratio = r.ingredients.length ? have / r.ingredients.length : 0;
     return { recipe: r, ratio };
-  }));
+  });
 
   listEl.innerHTML = withMatch.map(({ recipe, ratio }) => recipeCardMini(recipe, ratio)).join('');
   listEl.querySelectorAll('[data-action="open-recipe"]').forEach((el) => {

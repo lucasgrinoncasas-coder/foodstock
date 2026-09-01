@@ -7,10 +7,6 @@ import { getEntriesForDate, entryLabel } from '../calendar.js';
 import { getRecommendation } from '../aiService.js';
 import { navigate } from '../ui.js';
 import { escapeHTML, todayKey, addDays } from '../utils.js';
-import { openAddProductModal } from './inventory.js';
-import { openQuickCookModal } from './ai.js';
-import { openAddCalendarEntryModal } from './calendarView.js';
-import { openAddShoppingItemModal } from './shoppingView.js';
 
 function greeting() {
   const hour = new Date().getHours();
@@ -146,10 +142,22 @@ function wireEvents(container, householdId) {
     el.addEventListener('click', () => navigate(el.dataset.nav));
   });
 
-  container.querySelector('#qa-add-food')?.addEventListener('click', () => openAddProductModal(householdId));
-  container.querySelector('#qa-add-shopping')?.addEventListener('click', () => openAddShoppingItemModal(householdId));
-  container.querySelector('#qa-cook')?.addEventListener('click', () => openQuickCookModal(householdId));
-  container.querySelector('#qa-plan')?.addEventListener('click', () => openAddCalendarEntryModal(householdId, todayKey()));
+  container.querySelector('#qa-add-food')?.addEventListener('click', async () => {
+    const { openAddProductModal } = await import('./inventory.js');
+    openAddProductModal(householdId);
+  });
+  container.querySelector('#qa-add-shopping')?.addEventListener('click', async () => {
+    const { openAddShoppingItemModal } = await import('./shoppingView.js');
+    openAddShoppingItemModal(householdId);
+  });
+  container.querySelector('#qa-cook')?.addEventListener('click', async () => {
+    const { openQuickCookModal } = await import('./ai.js');
+    openQuickCookModal(householdId);
+  });
+  container.querySelector('#qa-plan')?.addEventListener('click', async () => {
+    const { openAddCalendarEntryModal } = await import('./calendarView.js');
+    openAddCalendarEntryModal(householdId, todayKey());
+  });
 
   container.querySelectorAll('[data-action="add-to-shopping-from-home"]').forEach((btn) => {
     btn.addEventListener('click', async () => {
