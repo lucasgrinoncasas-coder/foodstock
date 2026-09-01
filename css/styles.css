@@ -609,6 +609,27 @@ input, select, textarea { font-family: inherit; font-size: 16px; }
 .nutrition-label { font-size: 10.5px; color: var(--color-text-muted); }
 .nutrition-disclaimer { font-size: 11.5px; color: var(--color-text-faint); margin-top: 8px; }
 
+/* --- Boot loader (pantalla de carga inicial) --- */
+#boot-loader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--color-bg);
+  z-index: 500;
+  transition: opacity 0.25s ease;
+}
+#boot-loader.boot-loader-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.boot-logo { font-size: 48px; }
+.boot-label { color: var(--color-text-muted); font-size: 13.5px; }
+#boot-loader .spinner { margin: 0; }
+
 /* --- Auth screen --- */
 #auth-screen {
   min-height: 100vh;

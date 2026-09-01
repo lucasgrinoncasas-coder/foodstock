@@ -17,12 +17,22 @@
 <meta name="apple-mobile-web-app-title" content="FoodStock" />
 <meta name="mobile-web-app-capable" content="yes" />
 
+<link rel="preconnect" href="https://www.gstatic.com" />
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
+<link rel="preconnect" href="https://firestore.googleapis.com" />
+
 <link rel="stylesheet" href="css/styles.css" />
 <link rel="stylesheet" href="css/responsive.css" />
 </head>
 <body>
 
 <a class="skip-link" href="#app">Saltar al contenido</a>
+
+<div id="boot-loader">
+  <div class="boot-logo">🥫</div>
+  <div class="spinner"></div>
+  <p class="boot-label">Cargando FoodStock…</p>
+</div>
 
 <div id="auth-screen" class="hidden"></div>
 

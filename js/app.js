@@ -57,12 +57,21 @@ async function start() {
   await runApp();
 }
 
+function hideBootLoader() {
+  const loader = document.getElementById('boot-loader');
+  if (!loader) return;
+  loader.classList.add('boot-loader-hidden');
+  setTimeout(() => loader.remove(), 300);
+}
+
 function showAuthScreen() {
+  hideBootLoader();
   document.getElementById('auth-screen').classList.remove('hidden');
   document.getElementById('root').classList.add('hidden');
 }
 
 function showApp() {
+  hideBootLoader();
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('root').classList.remove('hidden');
 }
@@ -146,6 +155,8 @@ function registerServiceWorker() {
 
 start().catch((err) => {
   console.error('Error inicializando FoodStock:', err);
+  const loader = document.getElementById('boot-loader');
+  if (loader) loader.remove();
   const authScreen = document.getElementById('auth-screen');
   authScreen.classList.remove('hidden');
   document.getElementById('root').classList.add('hidden');
